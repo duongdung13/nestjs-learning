@@ -12,6 +12,14 @@ async function bootstrap() {
   app.useGlobalGuards(new JwtAuthGuard(reflector));
 
   app.useGlobalPipes(new ValidationPipe());
+
+  //config CORS
+  app.enableCors({
+    origin: '*',
+    methods: 'GET, HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+  });
+
   const PORT = configService.get<string>('PORT');
   await app.listen(PORT, () => {
     console.log(`App listen port ${PORT}`);
