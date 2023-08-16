@@ -45,4 +45,4 @@ export class Company {
   isDeleted: boolean;
 }
 
-export const UserSchema = SchemaFactory.createForClass(Company);
+export const CompanySchema = SchemaFactory.createForClass(Company);

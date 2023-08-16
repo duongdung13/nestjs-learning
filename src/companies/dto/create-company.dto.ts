@@ -11,7 +11,7 @@ export class CreateCompanyDto {
   address: string;
 
   @IsNotEmpty({
-    message: 'Name khong duoc de trong',
+    message: 'Description khong duoc de trong',
   })
   description: string;
 }
