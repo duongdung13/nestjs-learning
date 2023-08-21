@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel as NestInjectModel } from '@nestjs/mongoose';
@@ -76,8 +76,7 @@ export class UsersService {
     const mongoose = require('mongoose');
     if (!mongoose.Types.ObjectId.isValid(id)) return `Not found user`;
 
-    let user = await this.userModel.findOne({ _id: id });
-    delete user['password'];
+    let user = await this.userModel.findOne({ _id: id }).select('-password');
     return user;
   }
 
@@ -126,7 +125,14 @@ export class UsersService {
   async register(registerUserDto: RegisterUserDto) {
     const hashPassword = this.getHashPassword(registerUserDto.password);
 
-    let user = await this.userModel.create({
+    const isExist = await this.userModel.findOne({
+      email: registerUserDto.email,
+    });
+    if (isExist) {
+      throw new BadRequestException('Email ton tai');
+    }
+
+    return await this.userModel.create({
       email: registerUserDto.email,
       password: hashPassword,
       name: registerUserDto.name,
@@ -135,10 +141,5 @@ export class UsersService {
       gender: registerUserDto.gender,
       role: 'USER',
     });
-
-    return {
-      _id: user._id,
-      createdAt: user.createdAt,
-    };
   }
 }

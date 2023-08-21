@@ -1,4 +1,3 @@
-import { UsersService } from 'src/users/users.service';
 import {
   Controller,
   Request,
@@ -14,11 +13,7 @@ import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
-  UsersService: any;
-  constructor(
-    private authService: AuthService,
-    private usersService: UsersService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -36,6 +31,6 @@ export class AuthController {
   @ResponseMessage('Register a new user')
   @Post('/register')
   handleRegister(@Body() registerUserDto: RegisterUserDto) {
-    return this.usersService.register(registerUserDto);
+    return this.authService.register(registerUserDto);
   }
 }
