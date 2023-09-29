@@ -142,4 +142,15 @@ export class UsersService {
       role: 'USER',
     });
   }
+
+  async updateUserToken(refresh_token: string, id: string) {
+    return await this.userModel.updateOne(
+      {
+        _id: id,
+      },
+      {
+        refreshToken: refresh_token,
+      },
+    );
+  }
 }
