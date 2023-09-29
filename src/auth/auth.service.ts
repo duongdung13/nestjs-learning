@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/users.interface';
@@ -9,6 +10,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   // username/pass la 2 tham so thu vien passport nem ve.
@@ -38,8 +40,13 @@ export class AuthService {
       email,
       role,
     };
+
+    const access_token = this.jwtService.sign(payload);
+    this.usersService.updateUserToken(access_token, _id);
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: access_token,
+      refresh_token: this.createRefreshToken(payload),
       _id,
       name,
       email,
@@ -55,4 +62,11 @@ export class AuthService {
       createdAt: newUser?.createdAt,
     };
   }
+
+  createRefreshToken = (payload) => {
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('JWT_REFRESH_TOKEN'),
+      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRE'),
+    });
+  };
 }
